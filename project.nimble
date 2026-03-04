@@ -25,7 +25,13 @@ task make, "Build for ARM Cortex-M7":
   nimCmd.add(" --define:useMalloc --define:noSignalHandler")
   
   # Include nimphea src and libDaisy
-  nimCmd.add(" --path:" & nimpheaPath / "src")
+  # nimble path returns the package root; in installed packages Nimble flattens
+  # src/ to the root, so nimphea.nim lives at the root. In develop mode (nimble develop)
+  # the repo structure is intact and nimphea.nim lives under src/.
+  let nimpheaSrc =
+    if fileExists(nimpheaPath / "src" / "nimphea.nim"): nimpheaPath / "src"
+    else: nimpheaPath
+  nimCmd.add(" --path:" & nimpheaSrc)
   
   # Link with libDaisy (assume built by nimble install)
   nimCmd.add(" --passL:-L" & nimpheaPath / "libDaisy/build")
